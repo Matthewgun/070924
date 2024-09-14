@@ -8,36 +8,17 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, macOS-latest]
+    runs-on: ubuntu-latest
     permissions: write-all
     steps:
-    
       - uses: actions/checkout@v3
         with:
           submodules: true
-      - name: Install dependencies
-        if: matrix.os == 'ubuntu-latest'
-        run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
-      - name: Install dependencies
-        if: matrix.os == 'macOS-latest'
-        run: brew install boost
-      - name: Build
-        run: cmake . -DPATCH_VERSION=${{ github.run_number }}
+      - run: sudo apt-get update && sudo apt-get install libboost-test-dev -y
+      - run: cmake . -DPATCH_VERSION=${{ github.run_number }}
       - run: cmake --build .
       - run: cmake --build . --target test
       - run: cmake --build . --target package
-      - name: Create macOS DMG
-        if: matrix.os == 'macOS-latest'
-        run: |
-          pkgbuild --identifier "com.yourcompany.helloworld" \
-                  --version "1.2.3" \
-                  --install-location "/Applications" \
-                  --sign "Developer ID Application" \
-                  --output "app-1.2.3-macos.dmg" \
-                  build/release
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -48,24 +29,13 @@ jobs:
           release_name: Release ${{ github.run_number }}
           draft: false
           prerelease: false
-      - name: Upload Linux Release Asset
-        id: upload-linux-release-asset
+      - name: Upload Release Asset
+        id: upload-release-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/release/app-1.2.3-linux.deb
-          asset_name: app-1.2.3-linux.deb
+          asset_path: ./helloworld-0.0.${{ github.run_number }}-Linux.deb
+          asset_name: helloworld-0.0.${{ github.run_number }}-Linux.deb
           asset_content_type: application/vnd.debian.binary-package
-      - name: Upload macOS Release Asset
-        if: matrix.os == 'macOS-latest'
-        id: upload-macos-release-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/release/app-1.2.3-macos.dmg
-          asset_name: app-1.2.3-macos.dmg
-          asset_content_type: application/x-apple-diskimage
