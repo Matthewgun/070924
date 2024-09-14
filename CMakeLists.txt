@@ -61,13 +61,7 @@ enable_testing()
 # Add Test Target 
 add_test(NAME test_version COMMAND test_version) 
 
-# Define a custom target to run your tests 
-# (rename the target to avoid conflict with CTest)
-add_custom_target(run_tests
-  DEPENDS test_version
-  COMMAND ${CMAKE_COMMAND} -E echo "Running tests..."
-  COMMAND ${CMAKE_CTEST_COMMAND} -V -D Experimental
-)
+
 
 install(TARGETS helloworld_cli RUNTIME DESTINATION bin)
 

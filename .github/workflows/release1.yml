@@ -27,4 +27,5 @@ jobs:
           cmake ..
           make
       - name: Run tests
-        run: make run_tests 
+        run: |
+          ctest -V -D Experimental 
