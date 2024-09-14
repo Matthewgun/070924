@@ -72,3 +72,4 @@ include(CPack)
 enable_testing()
 
 add_test(test_version test_version)
+add_custom_target(run_tests ALL DEPENDS test_version)
