@@ -69,6 +69,8 @@ set(CPACK_PACKAGE_CONTACT example@example.com)
 
 include(CPack)
 
+# Enable Testing (This was already present, just added a comment)
 enable_testing()
 
-add_test(test_version test_version)
+# Add Test Target for your test_version executable
+add_test(NAME test_version COMMAND test_version)
