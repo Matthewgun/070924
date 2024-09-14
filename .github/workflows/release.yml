@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest # Использовать Ubuntu-latest для кросс-компиляции
     permissions: write-all
     steps:
       - uses: actions/checkout@v3
@@ -39,3 +39,24 @@ jobs:
           asset_path: ./helloworld-0.0.${{ github.run_number }}-Linux.deb
           asset_name: helloworld-0.0.${{ github.run_number }}-Linux.deb
           asset_content_type: application/vnd.debian.binary-package
+      - name: Build MacOS
+        runs-on: macos-latest # Добавляем задание для macOS
+        steps:
+          - uses: actions/checkout@v3
+            with:
+              submodules: true
+          - run: brew install boost # Установка Boost на macOS
+          - run: cmake . -DPATCH_VERSION=${{ github.run_number }}
+          - run: cmake --build .
+          - run: cmake --build . --target test
+          - run: cmake --build . --target package
+          - name: Upload MacOS Release Asset
+            id: upload-macos-release-asset
+            uses: actions/upload-release-asset@v1
+            env:
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            with:
+              upload_url: ${{ steps.create_release.outputs.upload_url }}
+              asset_path: ./helloworld-0.0.${{ github.run_number }}-macos.dmg # Указываем путь к DMG
+              asset_name: helloworld-0.0.${{ github.run_number }}-macos.dmg # Изменяем имя файла
+              asset_content_type: application/x-apple-diskimage

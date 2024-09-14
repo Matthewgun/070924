@@ -33,7 +33,22 @@ target_link_libraries(test_version
     helloworld
 )
 
-if (MSVC)
+# Добавляем условную компиляцию для macOS
+if (APPLE)
+    set(CMAKE_OSX_ARCHITECTURES arm64) # Установка архитектуры для macOS
+    target_compile_options(helloworld_cli PRIVATE
+        -Wall -Wextra -pedantic -Werror
+    )
+    target_compile_options(helloworld PRIVATE
+        -Wall -Wextra -pedantic -Werror
+    )
+    target_compile_options(test_version PRIVATE
+        -Wall -Wextra -pedantic -Werror
+    )
+    set(CPACK_GENERATOR DMG) # Изменение генератора CPack для macOS
+    set(CPACK_PACKAGE_NAME "helloworld-macos") # Изменение имени пакета
+    include(CPack)
+elseif (MSVC)
     target_compile_options(helloworld_cli PRIVATE
         /W4
     )
@@ -55,19 +70,7 @@ else ()
     )
 endif()
 
-
-
 install(TARGETS helloworld_cli RUNTIME DESTINATION bin)
-
-set(CPACK_GENERATOR DEB)
-
-set(CPACK_PACKAGE_VERSION_MAJOR "${PROJECT_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${PROJECT_VERSION_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${PROJECT_VERSION_PATCH}")
-
-set(CPACK_PACKAGE_CONTACT example@example.com)
-
-include(CPack)
 
 enable_testing()
 
