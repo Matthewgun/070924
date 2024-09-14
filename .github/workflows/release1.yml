@@ -2,29 +2,29 @@ name: macOS Build
 on:
   push:
     branches:
- - main
+      - main
   pull_request:
     branches:
- - main
+      - main
 
 jobs:
   build:
     runs-on: macOS-latest
     steps:
- - uses: actions/checkout@v2
- - name: Set up Xcode
+      - uses: actions/checkout@v2
+      - name: Set up Xcode
         # Remove xcode-select --install since it's already installed
         run: sudo xcodebuild -license accept
- - name: Install Homebrew
+      - name: Install Homebrew
         run: |
- /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
- - name: Install dependencies
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+      - name: Install dependencies
         run: brew install cmake boost
- - name: Build project
+      - name: Build project
         run: |
- mkdir build
- cd build
- cmake ..
- make
- - name: Run tests
+          mkdir build
+          cd build
+          cmake ..
+          make
+      - name: Run tests
         run: make test
